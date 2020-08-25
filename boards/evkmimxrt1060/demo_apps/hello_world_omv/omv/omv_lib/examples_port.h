@@ -1,0 +1,14 @@
+#define MINIMUM_IMAGE
+#define OMV_MAIN_FB_SIZE	(0x13000) // 76 * 1024
+#define OMV_FB_ALLOC_SIZE	(0x11000) // 68 * 1024
+
+#define OMV_FACE_DETECT 
+//#define OMV_EYE_DETECT
+
+
+#ifdef OMV_FACE_DETECT
+#undef OMV_MAIN_FB_SIZE
+#undef OMV_FB_ALLOC_SIZE
+#define OMV_MAIN_FB_SIZE 77 * 1024
+#define OMV_FB_ALLOC_SIZE	66*1024 //83*1024
+#endif
