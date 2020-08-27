@@ -287,7 +287,7 @@ __Vectors:
     .text
     .thumb
 	.thumb_func
-	.align 1
+	.align 2
 	.type	ConfigFlexRam, %function
 ConfigFlexRam:
 	ldr		r0,	= 0x400AC038	
@@ -307,8 +307,8 @@ ConfigFlexRam:
 	dsb
 	isb
 	bx lr
+	
 /* Reset Handler */
-
     .thumb_func
     .align 2
     .globl   Reset_Handler
@@ -317,7 +317,12 @@ ConfigFlexRam:
 Reset_Handler:
     cpsid   i               /* Mask interrupts */
     .equ    VTOR, 0xE000ED08
+	ldr		r2, =0x60000000 
+	mov		r0, pc
+	cmp 	r2, r0
+	bhi p10
 	bl ConfigFlexRam
+p10	:
     ldr     r0, =VTOR
     ldr     r1, =__Vectors	
     str     r1, [r0]
