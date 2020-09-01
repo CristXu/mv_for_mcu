@@ -15,9 +15,9 @@
 #include "cambus.h"
 
 /* Select USB1 PLL (480 MHz) as master lpi2c clock source */
-#define LPI2C_CLOCK_SOURCE_SELECT (1U)
+#define LPI2C_CLOCK_SOURCE_SELECT (0U)
 /* Clock divider for master lpi2c clock source */
-#define LPI2C_CLOCK_SOURCE_DIVIDER (0U)
+#define LPI2C_CLOCK_SOURCE_DIVIDER (5U)
 /* Get frequency of lpi2c clock */
 #define LPI2C_CLOCK_FREQUENCY ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) / (LPI2C_CLOCK_SOURCE_DIVIDER + 1U))
 #define LPI2C_MASTER_CLOCK_FREQUENCY LPI2C_CLOCK_FREQUENCY
@@ -30,7 +30,6 @@
 
 #define I2C_MASTER ((LPI2C_Type *)I2C_MASTER_BASE)
 
-#define LPI2C_MASTER_SLAVE_ADDR_7BIT 0x7EU
 #define LPI2C_BAUDRATE 100000U
 #define LPI2C_DATA_LENGTH 2U
 volatile bool g_MasterCompletionFlag = false;
@@ -111,13 +110,9 @@ int cambus_scan()
 */
 int cambus_readb(uint8_t slv_addr, uint8_t reg_addr, uint8_t *reg_data)    //blocking mode read until the buffer have somethin to read
 {
-   // lpi2c_master_transfer_t masterXfer = {0};
     status_t reVal = kStatus_Fail;
-    uint8_t data[2];
     uint8_t size = 0;
-    data[size++] = (uint8_t)reg_addr;
-   // __disable_irq();
-      while (1)
+    while (1)
     {
         reVal = LPI2C_MasterStart(I2C_MASTER, slv_addr, kLPI2C_Write);   //attention:in our read function,this will be the write,because i2c need send the control word to the salve kit before read.
 
@@ -131,7 +126,7 @@ int cambus_readb(uint8_t slv_addr, uint8_t reg_addr, uint8_t *reg_data)    //blo
             break;
         }
     }
-    LPI2C_MasterSend(I2C_MASTER, data, size);
+    LPI2C_MasterSend(I2C_MASTER, &reg_addr, 1);
 
     LPI2C_MasterStop(I2C_MASTER);
 
@@ -141,7 +136,6 @@ int cambus_readb(uint8_t slv_addr, uint8_t reg_addr, uint8_t *reg_data)    //blo
 
     LPI2C_MasterStop(I2C_MASTER);
 
-    //__enable_irq();
     return 0; 
 }
 
@@ -178,32 +172,29 @@ int cambus_readw(uint8_t slv_addr, uint8_t reg_addr, uint16_t *reg_data)     //n
 {
     status_t reVal = kStatus_Fail;
     lpi2c_master_transfer_t masterXfer = {0};
-   // __disable_irq();
-      while (1)
-    {
-        reVal = LPI2C_MasterStart(I2C_MASTER, slv_addr, kLPI2C_Read);
-
-        if (kStatus_Success != reVal)
-        {
-            LPI2C_MasterStop(I2C_MASTER);
-	    return -1;
-        }
-        else
-        {
-            break;
-        }
-    }
     /* Create the LPI2C handle for the non-blocking transfer */
     LPI2C_MasterTransferCreateHandle(I2C_MASTER, &g_m_handle, lpi2c_master_callback, NULL);
     /* subAddress = 0x01, data = g_master_rxBuff - read from slave.
       start + slaveaddress(w) + subAddress + repeated start + slaveaddress(r) + rx data buffer + stop */
-    masterXfer.slaveAddress = LPI2C_MASTER_SLAVE_ADDR_7BIT;
+    masterXfer.slaveAddress = slv_addr;
+    masterXfer.direction = kLPI2C_Write;
+    masterXfer.subaddress = 0;
+    masterXfer.subaddressSize = 0;
+    masterXfer.data = &reg_addr;
+    masterXfer.dataSize = 1;
+    reVal = LPI2C_MasterTransferNonBlocking(I2C_MASTER, &g_m_handle, &masterXfer);
+	
+	while (!g_MasterCompletionFlag)
+    {
+    }
+    g_MasterCompletionFlag = false;
+	
+    masterXfer.slaveAddress = slv_addr;
     masterXfer.direction = kLPI2C_Read;
-    masterXfer.subaddress = (uint32_t)slv_addr;
-    masterXfer.subaddressSize = 1;
+    masterXfer.subaddress = 0;
+    masterXfer.subaddressSize = 0;
     masterXfer.data = reg_data;
-    masterXfer.dataSize = LPI2C_DATA_LENGTH - 1;
-    masterXfer.flags = kLPI2C_TransferDefaultFlag;
+    masterXfer.dataSize = 2;
     reVal = LPI2C_MasterTransferNonBlocking(I2C_MASTER, &g_m_handle, &masterXfer);
     /*  Reset master completion flag to false. */
     g_MasterCompletionFlag = false;
@@ -226,37 +217,34 @@ int cambus_writew(uint8_t slv_addr, uint8_t reg_addr, uint16_t reg_data)
     status_t reVal = kStatus_Fail;
     lpi2c_master_transfer_t masterXfer = {0};
     reg_data = (reg_data >> 8) | (reg_data << 8);
-    //__disable_irq();
-      while (1)
-    {
-        reVal = LPI2C_MasterStart(I2C_MASTER, slv_addr, kLPI2C_Write);
-
-        if (kStatus_Success != reVal)
-        {
-            LPI2C_MasterStop(I2C_MASTER);
-	    return -1;
-        }
-        else
-        {
-            break;
-        }
-    }
       /* Create the LPI2C handle for the non-blocking transfer */
     LPI2C_MasterTransferCreateHandle(I2C_MASTER, &g_m_handle, lpi2c_master_callback, NULL);
      /* subAddress = 0x01, data = g_master_txBuff - write to slave.
       start + slaveaddress(w) + subAddress + length of data buffer + data buffer + stop*/
-    masterXfer.slaveAddress = LPI2C_MASTER_SLAVE_ADDR_7BIT;
+	
+	masterXfer.slaveAddress = slv_addr;
     masterXfer.direction = kLPI2C_Write;
-    masterXfer.subaddress = (uint32_t)slv_addr;
-    masterXfer.subaddressSize = 1;
+    masterXfer.subaddress = 0;
+    masterXfer.subaddressSize = 0;
+    masterXfer.data = &reg_addr;
+    masterXfer.dataSize = 1;
+    reVal = LPI2C_MasterTransferNonBlocking(I2C_MASTER, &g_m_handle, &masterXfer);
+	
+	while (!g_MasterCompletionFlag)
+    {
+    }
+    g_MasterCompletionFlag = false;
+	
+    masterXfer.slaveAddress = slv_addr;
+    masterXfer.direction = kLPI2C_Write;
+    masterXfer.subaddress = 0;
+    masterXfer.subaddressSize = 0;
     masterXfer.data = &reg_data;
-    masterXfer.dataSize = LPI2C_DATA_LENGTH;
+    masterXfer.dataSize = 2;
     masterXfer.flags = kLPI2C_TransferDefaultFlag;
 
     /* Send master non-blocking data to slave */
     reVal = LPI2C_MasterTransferNonBlocking(I2C_MASTER, &g_m_handle, &masterXfer);
-    /*  Reset master completion flag to false. */
-    g_MasterCompletionFlag = false;
     if (reVal != kStatus_Success)
     {
         return -1;
@@ -265,6 +253,7 @@ int cambus_writew(uint8_t slv_addr, uint8_t reg_addr, uint16_t reg_data)
     while (!g_MasterCompletionFlag)
     {
     }
+	g_MasterCompletionFlag = false;
     //__enable_irq();
     return 0;
 }

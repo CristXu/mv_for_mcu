@@ -71,14 +71,13 @@ int main(void)
 	sensor.set_pixformat(PIXFORMAT_GRAYSCALE);
 	sensor.set_framesize(FRAMESIZE_HQVGA);
 	sensor.skip_frames(1000);
-
+	#ifdef OMV_FACE_DETECT
 	DECLARE_AND_INIT_FUNCTION_PARAMS(HaarCascade, haar_kw);
 	cascade_t face_cascade = image.HaarCascade("frontalface", haar_kw);
 	
 	DECLARE_AND_INIT_FUNCTION_PARAMS(find_features, find_features_kw);
-	DECLARE_AND_INIT_FUNCTION_PARAMS(draw_rectangle, draw_rectangle_kw);
-    while (1)
-    {
+	while (1)
+	{
 		#ifdef USING_SENSOR_API
 		image_type img = *sensor.snapshot();
 		#else
@@ -90,6 +89,7 @@ int main(void)
 		#endif
 		uint32_t start = HAL_GetTick();
 		array_t * objects = img.find_features(&face_cascade, find_features_kw);
+		extern void free_qrcode_obj(qrcode_t* qrcodes_obj);
 		uint32_t end = HAL_GetTick();
 		if(array_length(objects) > 0) 
 			PRINTF("%d ms\r\n", (end - start));
@@ -98,5 +98,30 @@ int main(void)
 			img.draw_rectangle(r, draw_rectangle_kw);	
 		}	
 		array_free(objects);
-    }
+	}
+	#endif
+	#ifdef OMV_QRCODE_DETECT
+	DECLARE_AND_INIT_FUNCTION_PARAMS(draw_rectangle, draw_rectangle_kw);
+	DECLARE_AND_INIT_FUNCTION_PARAMS(find_qrcodes, find_qrcodes_kw);
+	DECLARE_AND_INIT_FUNCTION_PARAMS(lens_corr, lens_corr_kw);
+	while(1){
+		image_type img = *sensor.snapshot();
+		lens_corr_kw.strength = 2.8;
+		//img.lens_corr(lens_corr_kw);
+		uint32_t start = HAL_GetTick();
+		qrcode_t* qrcode = img.find_qrcodes(find_qrcodes_kw);
+		uint32_t end = HAL_GetTick();
+		if(qrcode->size) 
+			PRINTF("Total %d, %d ms\r\n", qrcode->size, (end - start));
+		for(int i=0;i<qrcode->size;i++){
+			qrcode_obj_t *cur = qrcode->qrcode + i;
+			rectangle_t* rect = qrcode->rect(cur);
+			draw_rectangle_kw.arg_c = 0;
+			img.draw_rectangle(rect, draw_rectangle_kw);
+			qrcode->print(cur);
+			free(rect);
+		}
+		free_qrcode_obj(qrcode);
+	}
+	#endif
 }

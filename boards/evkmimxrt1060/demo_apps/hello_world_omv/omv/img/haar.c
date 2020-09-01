@@ -254,6 +254,7 @@ int imlib_load_cascade(cascade_t *cascade, const char *path)
 {
     // built-in cascade
     if (strcmp(path, "frontalface") == 0) {
+		#if defined(OMV_FACE_DETECT) 
         cascade->window.w            = frontalface_window_w;
         cascade->window.h            = frontalface_window_h;
         cascade->n_stages            = frontalface_n_stages;
@@ -265,6 +266,7 @@ int imlib_load_cascade(cascade_t *cascade, const char *path)
         cascade->num_rectangles_array= (int8_t  *)frontalface_num_rectangles_array;
         cascade->weights_array       = (int8_t  *)frontalface_weights_array;
         cascade->rectangles_array    = (int8_t  *)frontalface_rectangles_array;
+		#endif
     } else if (strcmp(path, "eye") == 0) {
 		#if defined(OMV_EYE_DETECT) 
         cascade->window.w            = eye_window_w;

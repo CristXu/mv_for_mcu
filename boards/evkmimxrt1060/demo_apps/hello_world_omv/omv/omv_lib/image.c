@@ -6,6 +6,7 @@
 #include "xalloc.h"
 #include "fb_alloc.h"
 #include "framebuffer.h"
+#include "fsl_debug_console.h"
 #undef M_PI
 #define M_PI    3.141592654f
 #ifndef M_PI_2
@@ -75,6 +76,106 @@ array_t * find_features(cascade_t* cascade, find_features_opt opt_args){
 	}
 	return objects_array;
 }
+// qrcode 
+rectangle_t *rect(qrcode_obj_t* self) {
+	rectangle_t *rec = (rectangle_t *)malloc(sizeof(rectangle_t));
+	rec->x = self->x;
+	rec->y = self->y;
+	rec->w = self->w;
+	rec->h = self->h;
+	return rec;
+}
+void qrcode_print(qrcode_obj_t* self) {
+	PRINTF(
+		"{\"x\":%d, \"y\":%d, \"w\":%d, \"h\":%d, \"payload\":\"%s\","
+		" \"version\":%d, \"ecc_level\":%d, \"mask\":%d, \"data_type\":%d, \"eci\":%d}\r\n",
+		(self->x),(self->y),(self->w),(self->h),(self->payload),(self->version),(self->ecc_level),(self->mask),(self->data_type),(self->eci));
+	PRINTF("Corners in clock-wise: \r\n");
+	for (int i = 0;i < 3;i++) {
+		PRINTF("(%d, %d), ", self->corners.p[i].x, self->corners.p[i].y);
+	}
+	PRINTF("(%d, %d) \n\r", self->corners.p[3].x, self->corners.p[3].y);
+
+}
+void update_qrcode_obj(qrcode_obj_t* qrcode, find_qrcodes_list_lnk_data_t lnk_data) {
+	// update corners
+	// each corners has 4-points, differ from the MP's version in which has 4 corners for each with 1 point
+	corners_t corners;
+	for (int i = 0;i < 4;i++) {
+		corners.p[i].x = lnk_data.corners[i].x;
+		corners.p[i].y = lnk_data.corners[i].y;
+	}
+	qrcode->corners = corners;
+	// update rect
+	qrcode->x = lnk_data.rect.x;
+	qrcode->y = lnk_data.rect.y;
+	qrcode->w = lnk_data.rect.w;
+	qrcode->h = lnk_data.rect.h;
+	// update others.... 
+	qrcode->payload = (char*)malloc(sizeof(char) * (lnk_data.payload_len+1));
+	memcpy(qrcode->payload, lnk_data.payload, lnk_data.payload_len);
+	qrcode->payload[lnk_data.payload_len] = '\0'; // add tail 0, as the legal string
+
+	qrcode->version = lnk_data.version;
+	qrcode->ecc_level = lnk_data.ecc_level;
+	qrcode->mask = lnk_data.mask;
+	qrcode->data_type = lnk_data.data_type;
+	qrcode->eci = lnk_data.eci;
+	xfree(lnk_data.payload);
+}
+#define INIT_QRCODE_LOCAL_DICTS(self) \
+	self->rect = rect; \
+	self->print = qrcode_print; 
+
+qrcode_t* find_qrcodes(find_qrcodes_opt opt_args) {
+	image_t* image = img.img;
+	list_t out;
+	find_qrcodes_list_lnk_data_t lnk_data;
+	rectangle_t roi = {.x = 0, .y=0, .w=image->w, .h = image->h};
+	if (opt_args.roi) {
+		// update the roi with given value, if given_roi is not NULL
+		memcpy(&roi, &opt_args.roi, sizeof(rectangle_t));
+	}
+	fb_alloc_mark();
+	imlib_find_qrcodes(&out, image, &roi);
+	fb_alloc_free_till_mark();
+	size_t size = list_size(&out);
+	// malloc the rect_obj for list_size(&out)
+	qrcode_obj_t* qrcode = (qrcode_obj_t*)malloc(sizeof(qrcode_obj_t) * list_size(&out));
+	for (size_t i = 0; list_size(&out); i++) {
+		qrcode_obj_t* qrcode_cur = qrcode + i;
+		list_pop_front(&out, &lnk_data);
+		update_qrcode_obj(qrcode_cur, lnk_data);
+	}
+	qrcode_t* qrcode_array = (qrcode_t*)malloc(sizeof(qrcode_t));
+	INIT_QRCODE_LOCAL_DICTS(qrcode_array);
+	qrcode_array->qrcode = qrcode;
+	qrcode_array->size = size;
+	return (qrcode_array);
+}
+void free_qrcode_obj(qrcode_t* qrcodes_obj) {
+	assert(qrcodes_obj);
+	for (size_t i = 0; i < (qrcodes_obj->size); i++) {
+		qrcode_obj_t* wait_for_free = qrcodes_obj->qrcode + i;
+		xfree(wait_for_free->payload);
+	}
+	free(qrcodes_obj->qrcode);
+	free(qrcodes_obj);
+}
+
+// lens corr
+void lens_corr(lens_corr_opt opt_args){
+    image_t *arg_img = img.img;
+    float arg_strength = opt_args.strength;
+    assert(arg_strength > 0.0);
+    float arg_zoom = opt_args.zoom;
+    assert(arg_zoom > 0.0);
+
+    fb_alloc_mark();
+    imlib_lens_corr(arg_img, arg_strength, arg_zoom);
+    fb_alloc_free_till_mark();
+}
+
 image_module image = {
 	.HaarCascade = HaarCascade,
 };
@@ -82,7 +183,9 @@ image_module image = {
 image_type img =  {
 	.img = NULL,
 	.find_features = find_features,
+	.find_qrcodes = find_qrcodes,
 	.draw_rectangle = draw_rectangle,
+	.lens_corr = lens_corr,
 };
 
 

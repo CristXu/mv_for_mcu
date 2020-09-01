@@ -58,6 +58,9 @@ LR_m_text ocram_start ocram_size {   ; load region size_region
     * (InRoot$$Sections)
     .ANY (+RO)
   }
+  ER_qrcode +0  {
+	qrcode.o
+  }
   RW_m_data +0 { ; RW data
     .ANY (+RW +ZI)
   }

@@ -10,7 +10,7 @@
 #define __IMLIB_CONFIG_H__
 #include "examples_port.h"
 
-#ifndef OMV_FACE_DETECT
+#ifndef MINIMUM_IMAGE
 // Enable LAB LUT
 #define IMLIB_ENABLE_LAB_LUT
 
