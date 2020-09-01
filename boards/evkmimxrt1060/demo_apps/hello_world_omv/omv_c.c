@@ -104,6 +104,7 @@ int main(void)
 	DECLARE_AND_INIT_FUNCTION_PARAMS(draw_rectangle, draw_rectangle_kw);
 	DECLARE_AND_INIT_FUNCTION_PARAMS(find_qrcodes, find_qrcodes_kw);
 	DECLARE_AND_INIT_FUNCTION_PARAMS(lens_corr, lens_corr_kw);
+	DECLARE_AND_INIT_FUNCTION_PARAMS(draw_string, draw_string_kw);
 	while(1){
 		image_type img = *sensor.snapshot();
 		lens_corr_kw.strength = 2.8;
@@ -118,6 +119,7 @@ int main(void)
 			rectangle_t* rect = qrcode->rect(cur);
 			draw_rectangle_kw.arg_c = 0;
 			img.draw_rectangle(rect, draw_rectangle_kw);
+			img.draw_string(0, 0, cur->payload, draw_string_kw);
 			qrcode->print(cur);
 			free(rect);
 		}

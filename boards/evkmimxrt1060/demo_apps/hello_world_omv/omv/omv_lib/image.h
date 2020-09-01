@@ -28,6 +28,19 @@
 	.zoom = 1.0, \
 };
 
+#define draw_string_opt_default { \
+	.arg_c = -1, \
+	.arg_scale = 1.0, \
+	.arg_x_spacing = 0, \
+	.arg_y_spacing = 0, \
+	.arg_mono_space = true, \
+	.arg_char_rotation = true, \
+	.arg_char_hmirror = false, \
+	.arg_char_vflip = false, \
+	.arg_string_rotation = 0, \
+	.arg_string_hmirror = false, \
+	.arg_string_vflip = false, \
+};
 #define DECLARE_AND_INIT_FUNCTION_PARAMS(func, parms_name) \
 	func##_opt parms_name = func##_opt_default; 
 
@@ -78,12 +91,27 @@ typedef struct {
 	float zoom;
 }lens_corr_opt;
 
+typedef struct {
+	int arg_c;
+	float arg_scale;
+	int arg_x_spacing;
+	int arg_y_spacing;
+	bool arg_mono_space;
+	int arg_char_rotation;
+	int arg_char_hmirror;
+	int arg_char_vflip;
+	int arg_string_rotation;
+	int arg_string_hmirror;
+	int arg_string_vflip;
+}draw_string_opt;
+
 typedef struct image_type {
 	image_t* img;
-	array_t* (*find_features)(cascade_t*, find_features_opt opt_args);
-	void (*draw_rectangle)(rectangle_t*, draw_rectangle_opt opt_args);
-	qrcode_t* (*find_qrcodes)(find_qrcodes_opt opt_args);
-	void (*lens_corr)(lens_corr_opt opt_args);
+	array_t* (*find_features)(cascade_t*, find_features_opt);
+	void (*draw_rectangle)(rectangle_t*, draw_rectangle_opt);
+	qrcode_t* (*find_qrcodes)(find_qrcodes_opt);
+	void (*lens_corr)(lens_corr_opt);
+	void (*draw_string)(int, int, const char*, draw_string_opt);
 }image_type;
 
 #endif

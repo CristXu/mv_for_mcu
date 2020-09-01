@@ -176,6 +176,26 @@ void lens_corr(lens_corr_opt opt_args){
     fb_alloc_free_till_mark();
 }
 
+void draw_string(int arg_x_off, int arg_y_off, const char* arg_str, draw_string_opt opt_args){
+	image_t *arg_img = img.img;
+    int arg_c = opt_args.arg_c;
+    float arg_scale = opt_args.arg_scale;
+    assert(0 < arg_scale);
+    int arg_x_spacing = opt_args.arg_x_spacing;    
+    int arg_y_spacing = opt_args.arg_y_spacing;        
+    bool arg_mono_space = opt_args.arg_mono_space;
+    int arg_char_rotation = opt_args.arg_char_rotation;
+    int arg_char_hmirror = opt_args.arg_char_hmirror;
+    int arg_char_vflip = opt_args.arg_char_vflip;
+    int arg_string_rotation = opt_args.arg_string_rotation;
+    int arg_string_hmirror = opt_args.arg_string_hmirror;
+    int arg_string_vflip = opt_args.arg_string_vflip;
+	imlib_draw_string(arg_img, arg_x_off, arg_y_off, arg_str,
+                      arg_c, arg_scale, arg_x_spacing, arg_y_spacing, arg_mono_space,
+                      arg_char_rotation, arg_char_hmirror, arg_char_vflip,
+                      arg_string_rotation, arg_string_hmirror, arg_string_vflip);
+}
+
 image_module image = {
 	.HaarCascade = HaarCascade,
 };
@@ -186,6 +206,7 @@ image_type img =  {
 	.find_qrcodes = find_qrcodes,
 	.draw_rectangle = draw_rectangle,
 	.lens_corr = lens_corr,
+	.draw_string = draw_string,
 };
 
 
