@@ -70,11 +70,12 @@ int main(void)
 	sensor.reset();
 	sensor.set_pixformat(PIXFORMAT_GRAYSCALE);
 	sensor.set_framesize(FRAMESIZE_HQVGA);
+	//sensor.set_windowing(256, 240, 0, 0);
 	sensor.skip_frames(1000);
 	#ifdef OMV_FACE_DETECT
 	DECLARE_AND_INIT_FUNCTION_PARAMS(HaarCascade, haar_kw);
 	cascade_t face_cascade = image.HaarCascade("frontalface", haar_kw);
-	
+	DECLARE_AND_INIT_FUNCTION_PARAMS(draw_rectangle, draw_rectangle_kw);
 	DECLARE_AND_INIT_FUNCTION_PARAMS(find_features, find_features_kw);
 	while (1)
 	{

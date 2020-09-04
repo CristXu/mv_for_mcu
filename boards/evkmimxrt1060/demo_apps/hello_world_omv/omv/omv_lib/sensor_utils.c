@@ -30,6 +30,24 @@ void sensor_skip_frames(uint32_t ms){
 			}
 		}
 }
+
+int sensor_set_windowing_bundle(int x, int y, int w, int h){
+	// test if the (w==h) ==0, means drop x, y, only has w,h 
+	// array_len() == 2
+	assert(x || y || w || h);
+	int res_w = resolution[g_pcur_sensor->framesize][0];
+	int res_h = resolution[g_pcur_sensor->framesize][1];
+	if (!(w || h)) {
+		w = x;
+		h = y;
+		x = (res_w / 2) - (w / 2);
+		y = (res_h / 2) - (h / 2);
+	}
+	assert(w >= 8 && h >= 8);
+	assert(x >= 0 && ((x + w) <= res_w) && (y >= 0) && ((y + h) <= res_h));
+	return sensor_set_windowing(x, y, w, h);
+}
+
 sensor_api sensor = {
 	    // Sensor function pointers
    .reset = sensor_reset,
@@ -57,5 +75,7 @@ sensor_api sensor = {
    .set_lens_correction = sensor_set_lens_correction,
    .ioctl =  sensor_ioctl,
    .skip_frames = sensor_skip_frames,
+   
+   .set_windowing = sensor_set_windowing_bundle,
    .snapshot = snapshot,
 };

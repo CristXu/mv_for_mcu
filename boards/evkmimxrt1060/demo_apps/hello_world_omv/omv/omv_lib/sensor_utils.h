@@ -29,6 +29,8 @@ typedef struct sensor_api {
     int  (*set_lens_correction) (int enable, int radi, int coef);
     int  (*ioctl)               (int request, ...);
 	void (*skip_frames)         (uint32_t ms);
+	
+	int (*set_windowing)        (int x, int y, int w, int h);
     image_type *(*snapshot)     ();
 }sensor_api;
 #endif
