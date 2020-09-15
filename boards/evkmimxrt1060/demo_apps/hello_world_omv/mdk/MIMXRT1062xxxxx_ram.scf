@@ -32,6 +32,8 @@
 #define ocram_start            0x20200000
 #define ocram_size             0x000F8000
 
+#include "../omv/omv_lib/examples_port.h"
+	
 /* Sizes */
 #if (defined(__stack_size__))
   #define Stack_Size                   __stack_size__
@@ -47,8 +49,6 @@
 	
 #define m_interrupts_size                  0x400 
 #define m_ncache_unused_size               0x1000
-	
-#include "../omv/omv_lib/examples_port.h"
 
 LR_m_text ocram_start ocram_size {   ; load region size_region
   VECTOR_ROM ocram_start FIXED m_interrupts_size { ; load address = execution address

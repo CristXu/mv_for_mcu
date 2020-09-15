@@ -2,6 +2,27 @@
 #define SENSOR_UTILS_H
 #include "sensor.h"
 #include "image.h"
+
+#define set_auto_gain_opt_default  { \
+	.gain_db = NAN, \
+	.gain_db_ceiling = NAN, \
+};
+#define set_auto_whitebal_opt_default  { \
+	.r_gain_db = NAN, \
+	.g_gain_db = NAN, \
+	.b_gain_db = NAN, \
+};
+
+typedef struct {
+	float gain_db;
+	float gain_db_ceiling;
+}set_auto_gain_opt;
+
+typedef struct {
+	float r_gain_db;
+	float g_gain_db;
+	float b_gain_db;
+}set_auto_whitebal_opt;
 typedef struct sensor_api {
 	// Sensor function pointers
     int  (*reset)               ();
@@ -17,11 +38,11 @@ typedef struct sensor_api {
     int  (*set_gainceiling)     (gainceiling_t gainceiling);
     int  (*set_quality)         (int quality);
     int  (*set_colorbar)        (int enable);
-    int  (*set_auto_gain)       (int enable, float gain_db, float gain_db_ceiling);
+    int  (*set_auto_gain)       (int enable, set_auto_gain_opt);
     int  (*get_gain_db)         (float *gain_db);
     int  (*set_auto_exposure)   (int enable, int exposure_us);
     int  (*get_exposure_us)     (int *exposure_us);
-    int  (*set_auto_whitebal)   (int enable, float r_gain_db, float g_gain_db, float b_gain_db);
+    int  (*set_auto_whitebal)   (int enable, set_auto_whitebal_opt);
     int  (*get_rgb_gain_db)     (float *r_gain_db, float *g_gain_db, float *b_gain_db);
     int  (*set_hmirror)         (int enable);
     int  (*set_vflip)           (int enable);

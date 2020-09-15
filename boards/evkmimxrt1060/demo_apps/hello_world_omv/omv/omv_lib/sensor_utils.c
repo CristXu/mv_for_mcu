@@ -47,7 +47,17 @@ int sensor_set_windowing_bundle(int x, int y, int w, int h){
 	assert(x >= 0 && ((x + w) <= res_w) && (y >= 0) && ((y + h) <= res_h));
 	return sensor_set_windowing(x, y, w, h);
 }
-
+int sensor_set_auto_gain_bundle(int enable, set_auto_gain_opt opt_args){
+	float gain_db = opt_args.gain_db;
+	float gain_db_ceiling = opt_args.gain_db_ceiling;
+	return sensor_set_auto_gain(enable, gain_db, gain_db_ceiling);
+}
+int sensor_set_auto_whitebal_bundle(int enable, set_auto_whitebal_opt opt_args){
+	float r_gain_db = opt_args.r_gain_db;
+	float g_gain_db = opt_args.g_gain_db;
+	float b_gain_db = opt_args.b_gain_db;	
+	return sensor_set_auto_whitebal(enable, r_gain_db, g_gain_db, b_gain_db);
+}
 sensor_api sensor = {
 	    // Sensor function pointers
    .reset = sensor_reset,
@@ -63,11 +73,11 @@ sensor_api sensor = {
    .set_gainceiling = sensor_set_gainceiling,
    .set_quality =  sensor_set_quality,
    .set_colorbar = sensor_set_colorbar,
-   .set_auto_gain = sensor_set_auto_gain,
+   .set_auto_gain = sensor_set_auto_gain_bundle,
    .get_gain_db = sensor_get_gain_db,
    .set_auto_exposure = sensor_set_auto_exposure,
    .get_exposure_us = sensor_get_exposure_us,
-   .set_auto_whitebal = sensor_set_auto_whitebal,
+   .set_auto_whitebal = sensor_set_auto_whitebal_bundle,
    .get_rgb_gain_db = sensor_get_rgb_gain_db,
    .set_hmirror = sensor_set_hmirror,
    .set_vflip = sensor_set_vflip,

@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>0</interw>
-            <Optim>3</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-fno-common  -fdata-sections  -ffreestanding  -fno-builtin  -mthumb</MiscControls>
-              <Define>DEBUG, CPU_MIMXRT1062DVL6A, PRINTF_FLOAT_ENABLE=0, SCANF_FLOAT_ENABLE=0, PRINTF_ADVANCED_ENABLE=0, SCANF_ADVANCED_ENABLE=0, SERIAL_PORT_TYPE_UART=1</Define>
+              <Define>DEBUG, CPU_MIMXRT1062DVL6A, PRINTF_FLOAT_ENABLE=1, SCANF_FLOAT_ENABLE=0, PRINTF_ADVANCED_ENABLE=0, SCANF_ADVANCED_ENABLE=0, SERIAL_PORT_TYPE_UART=1</Define>
               <Undefine></Undefine>
               <IncludePath>..;../../..;../../../../../CMSIS/Include;../../../../../devices;../../../../../devices/MIMXRT1062/drivers;../../../../../devices/MIMXRT1062;../../../../../devices/MIMXRT1062/utilities/str;../../../../../devices/MIMXRT1062/utilities/debug_console;../../../../../components/uart;../../../../../components/serial_manager;../../../../../components/lists;../../../../../devices/MIMXRT1062/xip;../../../xip;../../../../../devices/MIMXRT1062/utilities;..\omv;..\omv\img;..\omv\omv_lib</IncludePath>
             </VariousControls>
@@ -1084,6 +1084,21 @@
               <FileType>1</FileType>
               <FilePath>..\omv\img\qrcode.c</FilePath>
             </File>
+            <File>
+              <FileName>apriltag.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\apriltag.c</FilePath>
+            </File>
+            <File>
+              <FileName>line.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\line.c</FilePath>
+            </File>
+            <File>
+              <FileName>stats.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\img\stats.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1113,6 +1128,26 @@
               <FileName>examples_port.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\omv\omv_lib\examples_port.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>cmsis_dsp</GroupName>
+          <Files>
+            <File>
+              <FileName>arm_cos_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\cmsis_dsp\FastMathFunctions\arm_cos_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_sin_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\cmsis_dsp\FastMathFunctions\arm_sin_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_common_tables.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\cmsis_dsp\CommonTables\arm_common_tables.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2196,6 +2231,21 @@
               <FileType>1</FileType>
               <FilePath>..\omv\img\qrcode.c</FilePath>
             </File>
+            <File>
+              <FileName>apriltag.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\apriltag.c</FilePath>
+            </File>
+            <File>
+              <FileName>line.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\line.c</FilePath>
+            </File>
+            <File>
+              <FileName>stats.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\img\stats.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2225,6 +2275,26 @@
               <FileName>examples_port.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\omv\omv_lib\examples_port.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>cmsis_dsp</GroupName>
+          <Files>
+            <File>
+              <FileName>arm_cos_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\cmsis_dsp\FastMathFunctions\arm_cos_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_sin_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\cmsis_dsp\FastMathFunctions\arm_sin_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_common_tables.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\cmsis_dsp\CommonTables\arm_common_tables.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -3308,6 +3378,21 @@
               <FileType>1</FileType>
               <FilePath>..\omv\img\qrcode.c</FilePath>
             </File>
+            <File>
+              <FileName>apriltag.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\apriltag.c</FilePath>
+            </File>
+            <File>
+              <FileName>line.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\line.c</FilePath>
+            </File>
+            <File>
+              <FileName>stats.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\img\stats.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3337,6 +3422,26 @@
               <FileName>examples_port.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\omv\omv_lib\examples_port.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>cmsis_dsp</GroupName>
+          <Files>
+            <File>
+              <FileName>arm_cos_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\cmsis_dsp\FastMathFunctions\arm_cos_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_sin_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\cmsis_dsp\FastMathFunctions\arm_sin_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_common_tables.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\omv\cmsis_dsp\CommonTables\arm_common_tables.c</FilePath>
             </File>
           </Files>
         </Group>
